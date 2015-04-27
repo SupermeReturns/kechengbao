@@ -1,31 +1,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:orientation="vertical" >
-
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="" />
-
-	<Button
-		android:id="@+id/logout"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginRight="18dp"
-		android:text="logout" />
-
-	<ListView
-		android:id="@+id/courses"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content" >
-	</ListView>
-	
-	<Button
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical" >
+ <LinearLayout
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal" >
+  
+ <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Monday" />
+ <Button
+    android:id="@+id/logout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="right"
+    android:text="logout" />
+  </LinearLayout>
+  
+ <android.support.v4.view.ViewPager
+     android:id="@+id/viewPager"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+     <requestFocus />
+ </android.support.v4.view.ViewPager>
+ 
+ <Button
     android:id="@+id/saoyisao"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginRight="18dp"
     android:text="扫一扫" />
-
+ 
 </LinearLayout>
