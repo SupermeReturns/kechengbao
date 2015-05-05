@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">kechengbao</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_faq">FAQ</string>
+    <string name="title_activity_show_cources">ShowCources</string>
+    <string name="title_activity_show_notices">ShowNotices</string>
+    <string name="title_activity_show_chapters">ShowChapters</string>
+    <string name="title_activity_actgroup">ActGroup</string>
+</resources>
