@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+    android:background="@mipmap/bg_2">
+
+	<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="星期二"
+        android:textColor="@android:color/black"
+        android:textSize="48dip"
+        android:textIsSelectable="true">
+  </TextView>
+  <ListView
+    android:id="@+id/courses2"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+      android:background="@android:color/darker_gray"
+      android:alpha="0.5">
+  </ListView>  
+
+</LinearLayout>
