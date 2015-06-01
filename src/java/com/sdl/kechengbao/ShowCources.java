@@ -31,6 +31,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +48,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class ShowCources extends Activity {
+public class ShowCources extends ActionBarActivity {
 	private ArrayList<View> views = new ArrayList<View>();
 	private List<Map<String, String>>[] mDataList = new ArrayList[5];
 	private Map<String, String> mMap;
@@ -197,7 +198,7 @@ public class ShowCources extends Activity {
     				HttpResponse response = new DefaultHttpClient(my_httpParams).execute(httppost);
 
 					str = EntityUtils.toString(response.getEntity());
-//				  str = "{\"UserID\":\"12330285\",\"Courses\":[\"00000001\"],\"Id\":{\"WorkID\":\"12330285\",\"CardID\":\"370682xxxx\",\"Email\":\"kassian@123.com\",\"Phone\":\"118012\"},\"Education\":{\"University\":\"\",\"School\":\"\",\"Major\":\"\",\"Level\":\"\",\"StartYear\":\"\",\"EndYear\":\"\"},\"Info\":{\"NickName\":\"\",\"Name\":\"\",\"Education\":[]}}";
+//				    str = "{\"UserID\":\"12330285\",\"Courses\":[\"00000001\"],\"Id\":{\"WorkID\":\"12330285\",\"CardID\":\"370682xxxx\",\"Email\":\"kassian@123.com\",\"Phone\":\"118012\"},\"Education\":{\"University\":\"\",\"School\":\"\",\"Major\":\"\",\"Level\":\"\",\"StartYear\":\"\",\"EndYear\":\"\"},\"Info\":{\"NickName\":\"\",\"Name\":\"\",\"Education\":[]}}";
 					Log.e("返回值", str);
 					
 					//联网成功获得指定信息
@@ -298,55 +299,31 @@ public class ShowCources extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_show_cources);
 
-    Bundle bundle = this.getIntent().getExtras();
-		sp = this.getSharedPreferences(this.userId + "_info", Context.MODE_PRIVATE);
+        Bundle bundle = this.getIntent().getExtras();
 		userId = bundle.getString("UserID");
 		password = bundle.getString("Password");
-    url = bundle.getString("ServerUrl");
+        url = bundle.getString("ServerUrl");
+        sp = this.getSharedPreferences(this.userId + "_info", Context.MODE_PRIVATE);
+        Log.v("MyLog", "ShowCourse onCreate userId:" + userId + " password: " + password + "url: " + url );
 
-    logout = (Button)findViewById(R.id.logout);
-    logout.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // 修改该用户的全局设置，取消自动登录
-            SharedPreferences settings = getSharedPreferences("Global_info", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("isLastUserLogin", false);
-            editor.commit();
+        // 激活ActionBar上显示应用图标
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
-            // 结束ShowCourse Activity
-            ShowCources.this.finish();
-        }
-    });
-    saoyisao = (Button)findViewById(R.id.saoyisao);
-    saoyisao.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent mIntent = new Intent();
-				Bundle mBundle = new Bundle();
-				mBundle.putString("UserID", userId);
-			  mBundle.putString("Password", password);
-			  mIntent.putExtras(mBundle);
-				mIntent.setClass(ShowCources.this, CaptureActivity.class);
-				startActivity(mIntent);
-			}
-		});
+        //初始化mDatalist
+        for (int i = 0; i < 5; i++) {
+            mDataList[i] = new ArrayList<Map<String, String>>();
+         }
 
-		//初始化mDatalist
-		for (int i = 0; i < 5; i++) {
-			mDataList[i] = new ArrayList<Map<String, String>>();
-		}
-		
-		//查询课程信息
-		queryData();
+         //查询课程信息
+         queryData();
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_faq, menu);
+		getMenuInflater().inflate(R.menu.menu_show_cources, menu);
 		return true;
 	}
 
@@ -356,9 +333,27 @@ public class ShowCources extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_scan) {
+            Intent mIntent = new Intent();
+            Bundle mBundle = new Bundle();
+            mBundle.putString("UserID", userId);
+            mBundle.putString("Password", password);
+            mIntent.putExtras(mBundle);
+            mIntent.setClass(ShowCources.this, CaptureActivity.class);
+            startActivity(mIntent);
 			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		} else if (id == R.id.action_quit) {
+            // 修改该用户的全局设置，取消自动登录
+            SharedPreferences settings = getSharedPreferences("Global_info", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("isLastUserLogin", false);
+            editor.commit();
+
+            // 结束ShowCourse Activity
+            this.finish();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
 	}
 }

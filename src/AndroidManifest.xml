@@ -26,13 +26,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-    <android:uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -53,7 +49,9 @@
         </activity>
         <activity
             android:name=".ShowCources"
-            android:label="@string/title_activity_show_cources" >
+            android:label="@string/title_activity_show_cources"
+            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/CustomActionBarTheme">
         </activity>
         <activity
             android:name=".ShowNotice"
@@ -78,11 +76,23 @@
         </activity>
         <activity
             android:name=".ActivityAsk"
-            android:label="@string/title_activity_activity_ask" >
+            android:label="@string/title_activity_activity_ask"
+            android:parentActivityName="com.sdl.kechengbao.FAQActivity"
+            android:theme="@style/CustomActionBarTheme">
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sdl.kechengbao.FAQActivity" />
         </activity>
         <activity
             android:name=".ActivityAnswer"
+            android:theme="@style/CustomActionBarTheme"
+            android:parentActivityName="com.sdl.kechengbao.FAQActivity"
             android:label="@string/title_activity_activity_answer" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sdl.kechengbao.FAQActivity" />
         </activity>
     </application>
 

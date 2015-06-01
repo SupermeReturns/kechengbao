@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ActivityAsk extends Activity implements View.OnClickListener {
+public class ActivityAsk extends ActionBarActivity implements View.OnClickListener {
     String serverUrl = "";  // 服务器地址
     String userId, password; // 用户名和密码
     String courseID; // 课程代号
@@ -60,6 +62,15 @@ public class ActivityAsk extends Activity implements View.OnClickListener {
                     // 代表服务交互出现问题,使用toast提示用户
                     Toast.makeText(getApplicationContext(), "提问成功！~",
                             Toast.LENGTH_SHORT).show();
+
+                    // 把结果返回上一级Activity
+                    Bundle data = new Bundle();
+                    // TO DO
+                    Intent intent = new Intent();
+                    intent.putExtras(data);
+                    setResult(Activity.RESULT_OK, intent);
+                    ActivityAsk.this.finish();
+
                     break;
                 default:
                     return;
@@ -83,6 +94,10 @@ public class ActivityAsk extends Activity implements View.OnClickListener {
         editText = (EditText)findViewById(R.id.editText);
         askBtn = (Button)findViewById(R.id.button);
         askBtn.setOnClickListener(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
     }
 
 
@@ -98,6 +113,13 @@ public class ActivityAsk extends Activity implements View.OnClickListener {
      */
     public void onClick(View v) {
         // 用户点击了askBtn按钮提问，转到转到单独的线程与服务器进行交互
+        if(this.editText.getText().toString().length() == 0)
+        {
+            Toast.makeText(getApplicationContext(), "内容不能为空，请重新输入",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Thread thread = new Thread(new MyThread());
         thread.start();
     }
@@ -111,10 +133,23 @@ public class ActivityAsk extends Activity implements View.OnClickListener {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.home)
+        {
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_CANCELED);
+        finish();
+        System.out.println("按下了back键   onBackPressed()");
+    }
+
     /**
      * <code>MyThread</code> 类型在单独线程中用于与服务器进行通信
      */
@@ -150,7 +185,7 @@ public class ActivityAsk extends Activity implements View.OnClickListener {
                     // 如果返回的状态码不是200，代表发生错误,发送错误通知给UI
                     handler.obtainMessage(0).sendToTarget();
                 }
-            } catch (ConnectTimeoutException|ConnectException | SocketTimeoutException e) {
+            } catch (ConnectTimeoutException| SocketException | SocketTimeoutException e) {
                 // handle time out, the server might be down
                 handler.obtainMessage(0).sendToTarget();
             }

@@ -2,6 +2,7 @@ package com.sdl.kechengbao;
 
 import android.app.ActivityGroup;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,10 +11,16 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class ActGroup extends ActivityGroup {
 
     private LinearLayout container = null;
+    private int curIdx = -1;
+    private TextView[] textViews = new TextView[4];
+    private ImageView[] imageViews = new ImageView[4];
+    private static final int[] buttons_normal = {R.drawable.buttons_1_normal, R.drawable.buttons_2_normal,R.drawable.buttons_3_normal,R.drawable.buttons_4_normal};
+    private static final int[] buttons_selected = {R.drawable.buttons_1_selected,R.drawable.buttons_2_selected,R.drawable.buttons_3_selected,R.drawable.buttons_4_selected};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,23 +39,31 @@ public class ActGroup extends ActivityGroup {
                 .getDecorView());
 
         // 模块1
-        ImageView btnModule1 = (ImageView) findViewById(R.id.btnModule1);
-        btnModule1.setOnClickListener(new OnClickListener() {
+        textViews[0] = (TextView)findViewById(R.id.text1);
+        imageViews[0] = (ImageView) findViewById(R.id.btnModule1);
+        imageViews[0].setOnClickListener(new OnClickListener() {
 
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
-                        ActGroup.this.finish();
-						// Intent mIntent = new Intent(ActGroup.this, ShowCources.class);
-						//startActivity(mIntent);
-					}   
+            public void onClick(View v) {
+                // 转换按键风格
+                ActGroup.this.changeButtonStyleTo(0);
+
+                ActGroup.this.finish();
+                // Intent mIntent = new Intent(ActGroup.this, ShowCources.class);
+                //startActivity(mIntent);
+            }
         });
 
         // 模块2
-       ImageView btnModule2 = (ImageView) findViewById(R.id.btnModule2);
-       btnModule2.setOnClickListener(new OnClickListener() {
-           @Override
+        textViews[1] = (TextView)findViewById(R.id.text2);
+        imageViews[1] = (ImageView) findViewById(R.id.btnModule2);
+        imageViews[1].setOnClickListener(new OnClickListener() {
+            @Override
             public void onClick(View v) {
-                if(ActGroup.this.getIntent().getExtras() == null) {
+                // 转换按键风格
+                ActGroup.this.changeButtonStyleTo(1);
+
+                // 跳转Activity
+                if (ActGroup.this.getIntent().getExtras() == null) {
                     Log.v("MyLog", "Null Bundle");
                 }
                 Intent mIntent = new Intent();
@@ -64,10 +79,15 @@ public class ActGroup extends ActivityGroup {
         });
 
         // 模块3
-       ImageView btnModule3 = (ImageView) findViewById(R.id.btnModule3);
-        btnModule3.setOnClickListener(new OnClickListener() {
+        textViews[2] = (TextView)findViewById(R.id.text3);
+        imageViews[2] = (ImageView) findViewById(R.id.btnModule3);
+        imageViews[2].setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 转换按键风格
+                ActGroup.this.changeButtonStyleTo(2);
+
+                // 跳转Activity
                 Intent mIntent = new Intent();
                 mIntent.setClass(ActGroup.this, FAQActivity.class);
                 mIntent.putExtras(ActGroup.this.getIntent().getExtras());
@@ -80,10 +100,15 @@ public class ActGroup extends ActivityGroup {
             }
         });
         // 模块4
-        ImageView btnModule4 = (ImageView) findViewById(R.id.btnModule4);
-        btnModule4.setOnClickListener(new OnClickListener() {
+        textViews[3] = (TextView)findViewById(R.id.text4);
+        imageViews[3] = (ImageView) findViewById(R.id.btnModule4);
+        imageViews[3].setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 转换按键风格
+                ActGroup.this.changeButtonStyleTo(3);
+
+                // 跳转Activity
                 Intent mIntent = new Intent();
                 mIntent.setClass(ActGroup.this, ShowNotice.class);
                 mIntent.putExtras(ActGroup.this.getIntent().getExtras());
@@ -95,6 +120,26 @@ public class ActGroup extends ActivityGroup {
                         .getDecorView());
             }
         });
+
+        // 转换按键风格
+        this.changeButtonStyleTo(1);
     }
-    
+
+    private void  changeButtonStyleTo(int i)
+    {
+        // 恢复上一个按键的风格
+        if (curIdx != -1)
+        {
+            textViews[curIdx].setTextColor(Color.rgb(0, 0, 0));
+            imageViews[curIdx].setImageResource(buttons_normal[curIdx]);
+        }
+
+        // 调整下一个按键的风格
+        textViews[i].setTextColor(Color.rgb(255, 255, 255));
+        imageViews[i].setImageResource(buttons_selected[i]);
+
+        // 标记选中按钮的索引
+        curIdx = i;
+    }
+
 }

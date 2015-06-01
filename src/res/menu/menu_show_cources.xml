@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context="com.sdl.kechengbao.ShowCources">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+    <item android:id="@+id/action_scan"
+        android:icon="@mipmap/scan"
+        android:title="扫一扫"
+        app:showAsAction="always|withText"
+        android:orderInCategory="100" />
+    <item android:id="@+id/action_quit"
+        android:icon="@mipmap/quit"
+        android:title="退出"
+        app:showAsAction="never|withText"
         android:orderInCategory="100" />
 </menu>

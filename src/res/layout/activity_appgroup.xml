@@ -8,7 +8,7 @@
         android:layout_weight="1" android:layout_height="fill_parent"
         android:layout_width="fill_parent">
     </LinearLayout>
-    <LinearLayout android:background="@android:color/holo_blue_bright"
+    <LinearLayout android:background="@android:color/holo_blue_dark"
         android:layout_gravity="bottom" android:orientation="horizontal"
         android:layout_width="fill_parent" android:layout_height="wrap_content">
 
@@ -17,12 +17,13 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <!-- 功能模块按钮1 -->
-            <ImageView android:id="@+id/btnModule1" android:src="@mipmap/buttons_1"
+            <ImageView android:id="@+id/btnModule1" android:src="@drawable/buttons_1_normal"
                 android:layout_gravity="center"
                 android:layout_marginLeft="7dp" android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_marginBottom="3dp" android:layout_width="fill_parent"
+                android:layout_height="70px" />
             <TextView android:text="返回"
+                android:id="@+id/text1"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -34,12 +35,13 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <!-- 功能模块按钮2 -->
-            <ImageView android:id="@+id/btnModule2" android:src="@mipmap/buttons_2"
+            <ImageView android:id="@+id/btnModule2" android:src="@drawable/buttons_2_normal"
                 android:layout_gravity="center"
                 android:layout_marginLeft="7dp" android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_marginBottom="3dp" android:layout_width="fill_parent"
+                android:layout_height="70px" />
             <TextView android:text="章节"
+                android:id="@+id/text2"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -51,12 +53,13 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <!-- 功能模块按钮3 -->
-            <ImageView android:id="@+id/btnModule3" android:src="@mipmap/buttons_3"
+            <ImageView android:id="@+id/btnModule3" android:src="@drawable/buttons_3_normal"
                 android:layout_gravity="center"
                 android:layout_marginLeft="7dp" android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_marginBottom="3dp" android:layout_width="fill_parent"
+                android:layout_height="70px" />
             <TextView android:text="答疑"
+                android:id="@+id/text3"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -68,13 +71,15 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <!-- 功能模块按钮4 -->
-            <ImageView android:id="@+id/btnModule4" android:src="@mipmap/buttons_4"
+            <ImageView android:id="@+id/btnModule4" android:src="@drawable/buttons_4_normal"
                 android:layout_gravity="center"
                 android:layout_marginLeft="7dp" android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp" android:layout_width="wrap_content"
+                android:layout_marginBottom="3dp" android:layout_width="fill_parent"
                 android:alpha="128"
-                android:layout_height="wrap_content" />
+                android:layout_height="70px"
+                android:cropToPadding="true" />
             <TextView android:text="通知"
+                android:id="@+id/text4"
                 android:textColor="@android:color/black"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"

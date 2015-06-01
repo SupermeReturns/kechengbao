@@ -9,7 +9,8 @@
     android:layout_height="wrap_content"
     android:text="星期一"
       android:textSize="48dip"
-      android:textColor="@android:color/black">
+      android:textColor="@android:color/black"
+      android:background="#00ffffff">
   </TextView>
   <ListView
         android:id="@+id/courses1"

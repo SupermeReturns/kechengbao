@@ -2,13 +2,15 @@
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
     -->
     <style name="AppBaseTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
+            backward-compatibility can go here.
+
         -->
     </style>
 
@@ -17,4 +19,29 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme"
+        parent="@style/Theme.AppCompat.Light">
+        <item name="android:actionBarStyle">@style/MyAppActionBarStyle</item>
+
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/MyAppActionBarStyle</item>
+    </style>
+
+
+    <style name="MyAppActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@drawable/dark_blue_with_stroke</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyAppActionOverflowButtonStyle</item>
+
+        <!-- Support library compatibility -->
+        <item name="background">@drawable/dark_blue_with_stroke</item>
+        <item name="actionOverflowButtonStyle">@style/MyAppActionOverflowButtonStyle</item>      
+    </style>
+
+    <style name="MyAppActionOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:background">@android:color/white</item>
+
+        <!-- Support library compatibility -->
+        <item name="background">@android:color/white</item>
+    </style>
 </resources>

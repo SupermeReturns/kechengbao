@@ -11,7 +11,8 @@
     android:text="星期二"
         android:textColor="@android:color/black"
         android:textSize="48dip"
-        android:textIsSelectable="true">
+        android:textIsSelectable="true"
+        android:background="#00ffffff">
   </TextView>
   <ListView
     android:id="@+id/courses2"

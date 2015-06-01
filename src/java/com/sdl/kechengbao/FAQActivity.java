@@ -2,11 +2,9 @@ package com.sdl.kechengbao;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +14,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterViewAnimator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +25,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
@@ -42,12 +36,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 public class FAQActivity extends Activity implements OnClickListener {
@@ -58,6 +53,7 @@ public class FAQActivity extends Activity implements OnClickListener {
     private Button askBtn;
     private ListView lv;
     private List<Map<String, String>> mData = new ArrayList<Map<String, String>>(); // 存储的FAQ数据，用于ListView进行展示
+    private MyAdatper adapter;
 
     // 用户处理服务器返回的信息。根据服务器返回的内容，执行特定动作（主要是调整用户UI）
     Handler handler = new Handler() {
@@ -72,7 +68,10 @@ public class FAQActivity extends Activity implements OnClickListener {
                         break;
                     case 1:
                         // 代表获取到问题列表，开始显示出来
-                    {
+                        // 清空以前的数据
+                        mData.clear();
+
+                        // 开始获取新的数据
                         JSONArray jsonObjs = new JSONArray((String) msg.obj);
                         for (int i = 0; i < jsonObjs.length(); i++) {
                             JSONObject jsonObj = (JSONObject) jsonObjs.opt(i);
@@ -96,6 +95,7 @@ public class FAQActivity extends Activity implements OnClickListener {
                             if (answerBody.isEmpty()) {
                                 answerBody = "No one answered yet!";
                             }
+
                             Map<String, String> mMap;
                             mMap = new HashMap<String, String>();
                             mMap.put("questionNo", questionNo);
@@ -104,14 +104,17 @@ public class FAQActivity extends Activity implements OnClickListener {
                             mMap.put("answerBody", answerBody);
                             mData.add(mMap);
                         }
-                    }
-                    Log.v("MyLog", "After get question, mData:" + mData.toString());
-                    MyAdatper adapter = new MyAdatper(FAQActivity.this);
-                    lv.setAdapter(adapter);
-                    break;
+                        Log.v("MyLog", "After get question, mData:" + mData.toString());
+
+                        // 刷新ListView的显示
+                        FAQActivity.this.adapter.notifyDataSetChanged();
+                        break;
+                    case 2:
+                        FAQActivity.this.adapter.notifyDataSetChanged();
+                        break;
                     default:
                         return;
-                }
+                    }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -131,6 +134,7 @@ public class FAQActivity extends Activity implements OnClickListener {
         serverUrl = mBundle.getString("ServerUrl");
         courseID = mBundle.getString("CourseID");
         /////////////////////////////////////////////
+        Log.v("MyLog", "FAQ onCreate: userId" + userId + " password:" + password + " serverUrl:" + serverUrl);
 
         askBtn = (Button) findViewById(R.id.askBtn);
         askBtn.setOnClickListener(this);
@@ -147,9 +151,11 @@ public class FAQActivity extends Activity implements OnClickListener {
                 //运行时使用
                 mIntent.setClass(FAQActivity.this, ActivityAnswer.class);
                 mIntent.putExtras(mBundle);
-                startActivity(mIntent);
+                startActivityForResult(mIntent, 0);
             }
         });
+        adapter = new MyAdatper(FAQActivity.this);
+        lv.setAdapter(adapter);
         this.getQuestion();
     }
 
@@ -172,7 +178,48 @@ public class FAQActivity extends Activity implements OnClickListener {
         Intent mIntent = new Intent();
         mIntent.setClass(FAQActivity.this, ActivityAsk.class);
         mIntent.putExtras(FAQActivity.this.getIntent().getExtras());
-        startActivity(mIntent);
+        startActivityForResult(mIntent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == 0)
+        {
+            // ActivityAnswer的返回信息
+            switch (resultCode)
+            {
+                case RESULT_OK:
+                {
+                    // 用户回答问题成功,尝试刷新ListView
+                    Thread thread = new Thread(new MyThread(MyThread.UPDATE_AFTER_ANSWER, data));
+                    thread.start();
+                }
+                case RESULT_CANCELED:
+                {
+                    // 用户回答问题失败
+                    return;
+                }
+            }
+        }
+        else if (requestCode == 1)
+        {
+            // ActionAsk的返回信息
+            switch (resultCode)
+            {
+                case RESULT_OK:
+                {
+                    // 用户回答问题成功,尝试刷新ListView
+                    Thread thread = new Thread(new MyThread(MyThread.UPDATE_AFTER_ASK));
+                    thread.start();
+                }
+                case RESULT_CANCELED:
+                {
+                    // 用户回答问题失败
+                    return;
+                }
+            }
+        }
     }
 
     @Override
@@ -235,11 +282,8 @@ public class FAQActivity extends Activity implements OnClickListener {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder = null;
-            Log.v("MyLog", "Postion" + position);
-
             if (convertView == null) {
                 // TEST //
-                Log.v("MyLog", "Making a new Holder");
                 holder = new ViewHolder();
 
                 convertView = mInflater.inflate(R.layout.list_questions, null);
@@ -250,17 +294,16 @@ public class FAQActivity extends Activity implements OnClickListener {
                 convertView.setTag(holder);
             } else {
                 // TEST //
-                Log.v("MyLog", "Get a old Holder");
                 holder = (ViewHolder) convertView.getTag();
             }
             holder.questionNo.setText(mData.get(position).get("questionNo"));
             holder.questionBody.setText(mData.get(position).get("questionBody"));
             holder.questionStamp.setText(mData.get(position).get("questionStamp"));
             String ans;
-            if (mData.get(position).get("answerBody").length() < 20)
+            if (mData.get(position).get("answerBody").length() < 25)
                 ans = mData.get(position).get("answerBody");
             else
-                ans = mData.get(position).get("answerBody").substring(0, 20) + "...";
+                ans = mData.get(position).get("answerBody").substring(0, 25) + "...";
             holder.answerBody.setText(ans);
 
             return convertView;
@@ -271,6 +314,29 @@ public class FAQActivity extends Activity implements OnClickListener {
      *  <code>MyThread</code>  实现了Runnable接口的类，用于在单独的线程与服务器进行通信
      */
     class MyThread implements  Runnable {
+        public static final int UPDATE_FIST_TIME = 1;
+        public static final int UPDATE_AFTER_ASK = 2;
+        public static final int UPDATE_AFTER_ANSWER = 3;
+        private int actionID = -1;
+        private Intent data = null;
+
+        public MyThread(int id_, Intent data_)
+        {
+            actionID = id_;
+            data = data_;
+        }
+
+        public MyThread(int id_)
+        {
+            actionID = id_;
+        }
+
+        public  MyThread()
+        {
+            actionID = UPDATE_FIST_TIME;
+            data = null;
+        }
+
         public void run() {
             try {
                 List<NameValuePair> list = new ArrayList<NameValuePair>();
@@ -314,17 +380,75 @@ public class FAQActivity extends Activity implements OnClickListener {
                     // 如果返回的状态码不是200，代表发生错误,发送错误通知给UI
                     handler.obtainMessage(0).sendToTarget();
                 }
-            } catch (ConnectException | ConnectTimeoutException | SocketTimeoutException e) {
+            } catch (SocketException | ConnectTimeoutException | SocketTimeoutException e) {
                 // handle time out, the server might be down
-                Log.v("MyLog", "I am here");
                 SharedPreferences settings = getSharedPreferences(FAQActivity.this.userId+"_info", Context.MODE_PRIVATE);
                 String faqs =  settings.getString(FAQActivity.this.courseID + "_FAQ", null);
-                if ( faqs != null) {
-                    Log.v("MyLog", "1");
-                    handler.obtainMessage(1, faqs).sendToTarget();
-                } else{
-                    Log.v("MyLog", "2");
+
+                if (actionID == UPDATE_FIST_TIME)
+                {
+                    if ( faqs != null) {
+                        Log.v("MyLog", "1");
+                        handler.obtainMessage(1, faqs).sendToTarget();
+                    } else{
+                        Log.v("MyLog", "2");
+                        handler.obtainMessage(0).sendToTarget();
+                    }
+                } else if(actionID==UPDATE_AFTER_ASK){
                     handler.obtainMessage(0).sendToTarget();
+                }
+                else if (actionID == UPDATE_AFTER_ANSWER)
+                {
+                    try {
+                            Bundle bundle = data.getExtras();
+                            String questionNo = bundle.getString("QuestionNo");
+                            String answerArrayStr = bundle.getString("AnswerArray");
+                            JSONArray newAnswerArray = new JSONArray(answerArrayStr);
+
+                            // 更新mData,然后刷新ListView
+                            for (int i = 0; i < mData.size(); i++) {
+                                if (mData.get(i).get("questionNo").equals(questionNo)) {
+                                    String oldAnswers = mData.get(i).get("answerBody");
+                                    if (oldAnswers.equals("No one answered yet!"))
+                                        oldAnswers = "";
+                                    for (int j = 0; j < newAnswerArray.length(); j++) {
+                                        JSONObject ansObj = (JSONObject) newAnswerArray.opt(j);
+                                        oldAnswers += ansObj.getString("UserID") + ": " + ansObj.getString("Text") + "\n";
+                                    }
+                                    mData.get(i).put("answerBody", oldAnswers);
+                                    break;
+                                }
+                            }
+                            handler.obtainMessage(2).sendToTarget();
+
+                            // 更新保存的SharedPreferences
+                            JSONArray jsonObjs = new JSONArray(faqs);
+                            for (int i = 0; i < jsonObjs.length(); i++) {
+                                JSONObject jsonObj = (JSONObject) jsonObjs.opt(i);
+                                String qsn = jsonObj.getString("QuestionNo");
+                                if (qsn.equals(questionNo)) {
+                                    JSONArray oldAnswerArray;
+                                    if (jsonObj.has("Anwser")) {
+                                        oldAnswerArray = jsonObj.getJSONArray("Anwser");
+                                    } else {
+                                        oldAnswerArray = new JSONArray();
+                                    }
+                                    for (int j = 0; j < newAnswerArray.length(); j++) {
+                                        oldAnswerArray.put(newAnswerArray.opt(j));
+                                    }
+                                    jsonObj.put("Answer", oldAnswerArray);
+                                    jsonObjs.put(i, jsonObj);
+
+                                    SharedPreferences.Editor editor = settings.edit();
+                                    editor.putString(FAQActivity.this.courseID + "_FAQ", jsonObjs.toString());
+                                    editor.commit();
+                                    break;
+                                }
+                            }
+
+                    } catch (JSONException ex){
+                        throw new RuntimeException(ex);
+                    }
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);

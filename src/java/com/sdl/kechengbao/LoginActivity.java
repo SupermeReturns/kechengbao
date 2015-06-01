@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends Activity implements OnClickListener{
-    String serverUrl = "http://172.18.35.97:8080/api";  // 服务器地址
+    String serverUrl = "http://172.18.32.154:8080/api";  // 服务器地址
     String UserID, Password; // 用户名和密码
     Button loginBt, registerBt;
     EditText passwordTxt, nameTxt;
@@ -110,6 +111,8 @@ public class LoginActivity extends Activity implements OnClickListener{
 
         if (!isLastUserLogin)
             return;
+        this.UserID = lastUserName;
+        this.Password = lastUserPass;
 
         Thread thread = new Thread(new MyThread(lastUserName, lastUserPass, MyThread.LOGIN));
         thread.start();
@@ -142,17 +145,7 @@ public class LoginActivity extends Activity implements OnClickListener{
      * @param v 被点击的控件
      */
     public void onClick(View v) {
-        // 与服务器通信前首先确认用户输入是否符合规范
-        Password = passwordTxt.getText().toString();
-        UserID = nameTxt.getText().toString();
-        if (!this.validateNameAndPass(UserID, Password)) {
-            // 提示用户的输入不符合规范
-            Toast.makeText(getApplicationContext(), "您的输入不符合规范！",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        // 尝试在单独的线程中与服务器联系
         int actionID;
         switch (v.getId()) {
             case R.id.loginButton:
@@ -164,42 +157,81 @@ public class LoginActivity extends Activity implements OnClickListener{
             default:
                 return;
         }
+        // 与服务器通信前首先确认用户输入是否符合规范
+        Password = passwordTxt.getText().toString();
+        UserID = nameTxt.getText().toString();
+        if (!this.validateNameAndPass(UserID, Password, actionID)) {
+            return;
+        }
+
+        // 尝试在单独的线程中与服务器联系
         Thread thread = new Thread(new MyThread(UserID, Password, actionID));
         thread.start();
-
-        /////// TEST //////////////
-        /*
-        Bundle mBundle = new Bundle();
-        mBundle.putString("UserID", UserID);
-        mBundle.putString("Password", Password);
-        mBundle.putString("ServerUrl", serverUrl);
-        Intent mIntent = new Intent();
-        mIntent.setClass(LoginActivity.this, ShowCources.class);
-        mIntent.putExtras(mBundle);
-        startActivity(mIntent);
-        */
     }
 
     /**
      * 检验用户名和密码是否符合规范（具体规范在以下代码注释中）
      * @param name 用户名
      * @param pass 密码
+     * @param actionID 动作代码（LOGIN or REGISTER）
      * @return 如果符合规范返回true，否则返回false
      */
-    private boolean validateNameAndPass(String name, String pass) {
+    private boolean validateNameAndPass(String name, String pass, int actionID) {
         // 账户名和密码都不能少于5位
         if((name.length() < 5) || (pass.length()< 5)) {
+            // 提示用户的输入不符合规范
+            if ((name.length() == 0)||(pass.length() == 0))
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码不能为空，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            if (actionID == MyThread.REGISTER)
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码不能少于5位，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码错误，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
             return false;
         }
 
         // 帐户名不能以"_"开头
         if (name.startsWith("_")) {
+            if (actionID == MyThread.REGISTER)
+            {
+                Toast.makeText(getApplicationContext(), "用户名不能以下划线开头，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码错误，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
             return false;
         }
 
         // 帐户名和密码都不能包含空格
-        return !(name.contains(" ") || pass.contains(" "));
+        if (name.contains(" ") || pass.contains(" "))
+        {
+            if (actionID == MyThread.REGISTER)
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码不能包含空格，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "用户名或密码错误，请重新输入",
+                        Toast.LENGTH_SHORT).show();
+            }
+            return false;
+        }
 
+        return true;
     }
 
     /**
@@ -282,11 +314,9 @@ public class LoginActivity extends Activity implements OnClickListener{
                     handler.obtainMessage(this.actionID, retStr).sendToTarget();
                 } else {
                     // 如果返回的状态码不是200，代表请求发生错误,发送错误通知给UI
-                    Log.v("MyLog","Wrong: " + httpResponse.getStatusLine().getStatusCode());
-                    Log.v("MyLog", EntityUtils.toString(httpResponse.getEntity()));
                     handler.obtainMessage(0).sendToTarget();
                 }
-            } catch (ConnectException | ConnectTimeoutException | SocketTimeoutException e) {
+            } catch (SocketException | ConnectTimeoutException | SocketTimeoutException e) {
                 // handle time out, the server might be down
 
                 SharedPreferences settings = getSharedPreferences(this.name+"_info", Context.MODE_PRIVATE);

@@ -66,8 +66,9 @@ public class ShowNotice extends Activity {
 				notice = notices.getJSONObject(i);
 				Map<String, String> mMap;
 				mMap = new HashMap<String, String>();
-				mMap.put("notice", notice.getString("Text") + "\n\t\tPosted on " + notice.getString("Date").substring(5,16));
-				Log.e("notice", mMap.toString());
+				mMap.put("notice", notice.getString("Text"));
+                mMap.put("timeStamp", "Posted on " + notice.getString("Date").substring(5,16));
+				Log.e("mMap", mMap.toString());
 				mDataList.add(mMap);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -80,7 +81,7 @@ public class ShowNotice extends Activity {
 //	设置ListView
 		lv = (ListView)findViewById(R.id.notices);
 		SimpleAdapter mSimpleAdapter = new SimpleAdapter(this,
-				nDataList, R.layout.list_notices, new String[]{"notice"}, new int[]{R.id.listNotice});
+				nDataList, R.layout.list_notices, new String[]{"notice", "timeStamp"}, new int[]{R.id.listNotice, R.id.timeStampText});
 		lv.setAdapter(mSimpleAdapter);
 	}
 	//传递消息，解析JSON并填充数据

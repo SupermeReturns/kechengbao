@@ -1,9 +1,12 @@
 package com.sdl.kechengbao;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,18 +27,24 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
-public class ActivityAnswer extends Activity implements View.OnClickListener  {
+public class ActivityAnswer extends ActionBarActivity implements View.OnClickListener  {
     String serverUrl = "";  // 服务器地址
     String userId, password; // 用户名和密码
     String courseID; // 课程代号
     String questionNo,questionBody, questionStamp, answerBody;
+    JSONArray newAnswers = new JSONArray();  // 新的回答
 
     private Button askBtn;
     private EditText editText;
@@ -55,6 +64,26 @@ public class ActivityAnswer extends Activity implements View.OnClickListener  {
                     // 代表服务交互出现问题,使用toast提示用户
                     Toast.makeText(getApplicationContext(), "回答成功！~",
                             Toast.LENGTH_SHORT).show();
+                    try {
+                        // 保存新的问题
+                        JSONObject obj = new JSONObject();
+                        obj.put("UserID", ActivityAnswer.this.userId);
+                        obj.put("Date", Calendar.getInstance().toString());
+                        obj.put("Text",  ActivityAnswer.this.editText.getText().toString());
+                        newAnswers.put(obj);
+
+                        // 刷新TextView显示
+                        String oldAnswerStr = ActivityAnswer.this.answerBodyText.getText().toString();
+                        if (oldAnswerStr.equals("No one answered yet!"))
+                            oldAnswerStr = "";
+                        oldAnswerStr += ActivityAnswer.this.userId + ": " + ActivityAnswer.this.editText.getText().toString()  + "\n";
+                        ActivityAnswer.this.answerBodyText.setText(oldAnswerStr);
+
+                        // 清空输入框
+                        ActivityAnswer.this.editText.setText("");
+                    } catch (JSONException ex) {
+                        throw new RuntimeException();
+                    }
                     break;
                 default:
                     return;
@@ -87,10 +116,15 @@ public class ActivityAnswer extends Activity implements View.OnClickListener  {
         questionStampText.setText(questionStamp);
         answerBodyText= (TextView)findViewById(R.id.answerBodyText);
         answerBodyText.setText(answerBody);
+        answerBodyText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         editText = (EditText)findViewById(R.id.editText2);
         askBtn = (Button)findViewById(R.id.button2);
         askBtn.setOnClickListener(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
     }
 
     @Override
@@ -110,17 +144,47 @@ public class ActivityAnswer extends Activity implements View.OnClickListener  {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else {
+            setResultImmediately();
+            finish();
+            return true;
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        setResultImmediately();
+        finish();
+        System.out.println("按下了back键   onBackPressed()");
+    }
+
+    private void setResultImmediately() {
+        Bundle data = new Bundle();
+        data.putString("QuestionNo", this.questionNo);
+        data.putString("AnswerArray", newAnswers.toString());
+        Intent intent = new Intent();
+        intent.putExtras(data);
+
+        if (newAnswers.length() != 0) {
+            setResult(Activity.RESULT_OK, intent);
+        } else {
+            setResult(Activity.RESULT_CANCELED, intent);
+        }
+    }
     /**
      * 用户点击按钮的回调函数
      * @param v 被点击的控件
      */
     public void onClick(View v) {
         // 用户点击了askBtn按钮提问，转到转到单独的线程与服务器进行交互
+        if(this.editText.getText().toString().length() == 0)
+        {
+            Toast.makeText(getApplicationContext(), "内容不能为空，请重新输入",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Thread thread = new Thread(new MyThread());
         thread.start();
     }
@@ -161,7 +225,7 @@ public class ActivityAnswer extends Activity implements View.OnClickListener  {
                     Log.v("MyLog", "str: "+EntityUtils.toString(httpResponse.getEntity()) + ", id: " + httpResponse.getStatusLine().getStatusCode() );
                     handler.obtainMessage(0).sendToTarget();
                 }
-            } catch (ConnectException | ConnectTimeoutException | SocketTimeoutException e) {
+            } catch (SocketException | ConnectTimeoutException | SocketTimeoutException e) {
                 // handle time out, the server might be down
                 handler.obtainMessage(0).sendToTarget();
             }catch (Exception ex) {

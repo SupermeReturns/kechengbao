@@ -7,8 +7,21 @@
     android:id="@+id/listNotice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:ems="10"
+    android:textSize="17dip"
+    android:textStyle="bold"
+    android:maxLines="2"
+    android:minLines="2"
+    android:text="Hello everyone, this is our first class"
     android:textColor="@android:color/black" />
-	
+
+    <TextView
+        android:id="@+id/timeStampText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="posted on 05:16 12-11"
+        android:minLines="1"
+        android:maxLines="1"
+        android:gravity="right"
+        android:textSize="10dip"
+        android:textColor="@android:color/black" />
 </LinearLayout>

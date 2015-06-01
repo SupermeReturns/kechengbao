@@ -9,33 +9,34 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="登录"
+        android:text="   Login    "
         android:id="@+id/loginButton"
-        android:background="#ff58bfe6"
-        android:textColor="#ffffffff"
+        android:background="@drawable/button_mild_style"
+        android:textColor="@android:color/black"
         android:layout_alignLeft="@+id/passwordText"
         android:layout_alignStart="@+id/passwordText"
-        android:layout_alignTop="@+id/registerButton"
-        android:textSize="35dip" />
+        android:textSize="35dip"
+        android:layout_alignTop="@+id/registerButton" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="注册"
+        android:text=" Register "
         android:id="@+id/registerButton"
-        android:background="#ff58bfe6"
-        android:textColor="#ffffffff"
+        android:background="@drawable/button_fierce_style"
         android:textSize="35dip"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/passwordText"
-        android:layout_alignEnd="@+id/passwordText" />
+        android:layout_alignEnd="@+id/passwordText"
+        android:singleLine="false"
+        android:textColor="#ffffffff" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:hint="Input Password"
-        android:ems="10"
+        android:ems="15"
         android:id="@+id/passwordText"
         android:layout_above="@+id/loginButton"
         android:layout_alignLeft="@+id/nameText"
@@ -47,7 +48,7 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:hint="Input name"
-        android:ems="10"
+        android:ems="15"
         android:id="@+id/nameText"
         android:layout_above="@+id/passwordText"
         android:layout_centerHorizontal="true" />

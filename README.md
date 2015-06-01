@@ -2,6 +2,40 @@
 
 #####A android app developed to help college student management courses.
 
+##2015/6/1 第三次迭代
+### 更新（DONE 表示已解决）：
+DONE 添加用于输入错误时候的提示 <br>
+DONE 设计应用图标和名字 <br>
+DONE ShowFAQ的ListView的长度和提问按钮重叠了，导致部分内容无法看到<br>
+DONE 提问和回答的界面有一个返回箭头表示分界面的标识，并且背景改变为蓝色<br>
+DONE 各个Title的文字(ShowCourse, ActivityAsk, ActivityAnswer)<br>
+DONE FAQ Activity有时候没有显示网络故障，尽管已经连接上了网络<br>
+DONE 将扫一扫和LOGOUT放在ActionBar的setting中，并且把ActionBar的背景改成Dark Blue<br>
+DONE ShowCourse的ActionBar上面加上应用图标<br>
+DONE ShowCourses的tileBar和按钮背景<br>
+DONE 应用风格的统一：ActGroup，answer, ask等等的各部分调整为blue.dark, 然后看一下效果如何。<br>
+DONE ActrionBar的popupmenu使用白色背景<br>
+DONE ActGroup的按键问题：<br>
+        1.无法知道那个按键被点中<br>
+        2.按键点击感不够<br>
+DONE 按键没有点击感<br>
+DONE ActivityGroup图标大小减小<br>
+DONE ShowNotice的布局<br>
+DONE 实现ActGroup到Ask和Answer之后返回更新的功能<br>
+
+###计划：
+各个ListView中的排序<br>
+ActionBar Left caret的R.id是多少？<br>
+给课程宝取个更好的名字吧~<br>
+显示一个课程的所有其他信息<br>
+ShowNotice实现一段时间之后不停进行查询<br>
+AnswerActivity的布局问题<br>
+ShowFAQ的用户名高亮功能<br>
+提示用户的密码错误<br>
+点赞/同问功能<br>
+作业提醒功能<br>
+
+
 ##2015/5/23 第二次迭代
 ### 更新：
 1.实现离线功能<br>
